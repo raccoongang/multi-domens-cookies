@@ -9,9 +9,9 @@ from django.contrib.auth.views import logout
 from multi_cookies.decorators import set_auth_cookie, external_redirect
 
 from student.views import LogoutView, login_user, signin_user, register_user
-from student_account.views import login_and_registration_form, 
+from student_account.views import login_and_registration_form
 from auth_exchange.views import LoginWithAccessTokenView
-from contentstore import views
+import contentstore.views
 import external_auth.views
 import django_cas.views
 
@@ -29,8 +29,8 @@ urlpatterns = patterns(
     url(r'^admin/login/$', set_auth_cookie(admin_site.login), name='admin:login'),
     url(r'^admin/logout/$', set_auth_cookie(wrap_admin(admin_site.logout)), name='logout'),
     # cms
-    url(r'^signup$', set_auth_cookie(views.signup), name='signup'),
-    url(r'^signin$', set_auth_cookie(views.login_page), name='login'),
+    url(r'^signup$', set_auth_cookie(contentstore.views.signup), name='signup'),
+    url(r'^signin$', set_auth_cookie(contentstore.views.login_page), name='login'),
     # lms
     url(r'^login_ajax$', set_auth_cookie(login_user), name="login"),
     url(r'^logout$', external_redirect(set_auth_cookie(LogoutView.as_view())),

@@ -34,3 +34,14 @@ def set_auth_cookie(view):
         return response
 
     return wrapper
+
+
+def external_redirect(view):
+    def wrapper(request, *args, **kwargs):
+        resp = view(request, *args, **kwargs)
+
+        if REDIRECT_FIELD_NAME in request.GET and resp.status_code == 302:
+            resp['Location'] = request.GET[REDIRECT_FIELD_NAME]
+        return resp
+
+    return wrapper
