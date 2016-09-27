@@ -11,7 +11,7 @@ class UserStandingMiddleware(object):
     """
     def process_response(self, request, response):
         log.info('{} !!!!'.format(dir(request)))
-        if 'admin' in request.path:
+        if 'admin' not in request.path:
             user = request.user
             is_auth = user.is_authenticated()
 
