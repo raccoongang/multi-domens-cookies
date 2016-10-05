@@ -1,16 +1,12 @@
-import logging
-
 from django.conf import settings
 
+import logging
 log = logging.getLogger(__name__)
 
-class UserStandingMiddleware(object):
-    """
-    Checks a user's standing on request. Returns a 403 if the user's
-    status is 'disabled'.
-    """
+
+class RemoteUserAuthMiddleware(object):
+
     def process_response(self, request, response):
-        log.info('{} !!!!'.format(dir(request)))
         if 'admin' not in request.path:
             user = request.user
             is_auth = user.is_authenticated()
