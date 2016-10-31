@@ -20,4 +20,9 @@ class RemoteUserAuthMiddleware(object):
                                 domain=settings.AUTH_SESSION_COOKIE_DOMAIN,
                                 secure=settings.SESSION_COOKIE_SECURE or None,
                                 max_age=settings.SESSION_COOKIE_AGE)
+            response.set_cookie('authenticated_email',
+                                is_auth and user.email or '',
+                                domain=settings.AUTH_SESSION_COOKIE_DOMAIN,
+                                secure=settings.SESSION_COOKIE_SECURE or None,
+                                max_age=settings.SESSION_COOKIE_AGE)
         return response
