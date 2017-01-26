@@ -1,4 +1,6 @@
 from django.conf import settings
+from django.shortcuts import redirect
+from django.core.urlresolvers import reverse
 
 import logging
 log = logging.getLogger(__name__)
@@ -26,3 +28,37 @@ class RemoteUserAuthMiddleware(object):
                                 secure=settings.SESSION_COOKIE_SECURE or None,
                                 max_age=settings.SESSION_COOKIE_AGE)
         return response
+
+
+class RedirectToPortal(object):
+    register_url = reverse('register_user')
+    registration_complete_url = reverse('registration-complete')
+    login_url = reverse('signin_user')
+    portal_host = settings.FEATURES.get('PORTAL_HOST', 'example.com')
+    portal_url = '{}://{}'.format(settings.FEATURES.get('PORTAL_SCHEME', 'http'), portal_host)
+    
+    def process_request(self, request):
+        if not request.user.is_authenticated():
+            is_register = request.META['PATH_INFO'] in (self.register_url, self.registration_complete_url)
+            is_internal_url = (
+                request.META['PATH_INFO'].startswith('/user_api')
+                or request.META['PATH_INFO'].startswith(settings.STATIC_URL)
+            )
+            is_oauth2_login = (
+                request.META['PATH_INFO'] == self.login_url 
+#                and (
+#                    'oauth2' in request.META['RAW_URI'] 
+#                    and self.portal_host in request.META['RAW_URI']
+#                   or request.META['HTTP_REFERER'].startswith(self.portal_url)
+#                )
+            )
+            is_oauht2_urls = (
+                request.META['PATH_INFO'].startswith('/oauth2') 
+                or request.META['PATH_INFO'].startswith('/auth') 
+                or request.META['PATH_INFO'].startswith('/login_oauth_token')
+            )
+
+            if is_register or is_internal_url or is_oauth2_login or is_oauht2_urls:
+                return None
+
+            return redirect(self.portal_url)
