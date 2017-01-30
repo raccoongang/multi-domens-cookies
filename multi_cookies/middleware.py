@@ -39,7 +39,10 @@ class RedirectToPortal(object):
     
     def process_request(self, request):
         if not request.user.is_authenticated():
-            is_register = request.META['PATH_INFO'] in (self.register_url, self.registration_complete_url)
+            is_register = (
+                request.META['PATH_INFO'] in (self.register_url, self.registration_complete_url)
+                or request.META['PATH_INFO'].startswith('activate')
+            )
             is_internal_url = (
                 request.META['PATH_INFO'].startswith('/user_api')
                 or request.META['PATH_INFO'].startswith(settings.STATIC_URL)
