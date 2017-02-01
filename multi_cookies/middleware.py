@@ -38,7 +38,8 @@ class RedirectToPortal(object):
     portal_url = '{}://{}'.format(settings.FEATURES.get('PORTAL_SCHEME', 'http'), portal_host)
     
     def process_request(self, request):
-        if not request.user.is_authenticated():
+        cms_host = getattr(settings, 'CMS_BASE', None)
+        if not request.user.is_authenticated() and cms_host and request.META['HTTP_HOST'] != cms_host:
             is_register = (
                 request.META['PATH_INFO'] in (self.register_url, self.registration_complete_url)
                 or request.META['PATH_INFO'].startswith('/activate')
