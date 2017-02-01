@@ -31,17 +31,18 @@ class RemoteUserAuthMiddleware(object):
 
 
 class RedirectToPortal(object):
-    register_url = reverse('register_user')
-    registration_complete_url = reverse('registration-complete')
-    login_url = reverse('signin_user')
     portal_host = settings.FEATURES.get('PORTAL_HOST', 'example.com')
     portal_url = '{}://{}'.format(settings.FEATURES.get('PORTAL_SCHEME', 'http'), portal_host)
     
     def process_request(self, request):
         cms_host = getattr(settings, 'CMS_BASE', None)
         if not request.user.is_authenticated() and cms_host and request.META['HTTP_HOST'] != cms_host:
+            register_url = reverse('register_user')
+            registration_complete_url = reverse('registration-complete')
+            login_url = reverse('signin_user')
+
             is_register = (
-                request.META['PATH_INFO'] in (self.register_url, self.registration_complete_url)
+                request.META['PATH_INFO'] in (register_url, registration_complete_url)
                 or request.META['PATH_INFO'].startswith('/activate')
             )
             is_internal_url = (
@@ -49,7 +50,7 @@ class RedirectToPortal(object):
                 or request.META['PATH_INFO'].startswith(settings.STATIC_URL)
             )
             is_oauth2_login = (
-                request.META['PATH_INFO'] == self.login_url 
+                request.META['PATH_INFO'] == login_url 
 #                and (
 #                    'oauth2' in request.META['RAW_URI'] 
 #                    and self.portal_host in request.META['RAW_URI']
